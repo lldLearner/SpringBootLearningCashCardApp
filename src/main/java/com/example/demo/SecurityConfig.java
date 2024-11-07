@@ -35,6 +35,8 @@ class SecurityConfig {
 
 		UserDetails hankHasNoRole = builder.username("hank-has-no-role").password(passwordEncoder.encode("sqs123"))
 				.roles("No-ROLE").build();
-		return new InMemoryUserDetailsManager(sarah, hankHasNoRole);
+		
+		UserDetails kumark = builder.username("kumark").password(passwordEncoder.encode("sns123")).roles("Card-ROLE").build();
+		return new InMemoryUserDetailsManager(sarah, hankHasNoRole, kumark);
 	}
 }

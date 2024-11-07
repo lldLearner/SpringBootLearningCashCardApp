@@ -11,9 +11,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,5 +60,30 @@ public class CashCardController {
 				PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
 						pageable.getSortOr(Sort.by(Sort.Direction.DESC, "amount"))));
 		return ResponseEntity.ok(page.getContent());
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<Void> updateCashCard(@RequestBody CashCard cashCard, @PathVariable Long id,
+			Principal principal) {
+
+		CashCard savedCashCard = cashCardRepository.findByIdAndOwner(id, principal.getName());
+		System.out.println(savedCashCard + " kartik " + id);
+		if (savedCashCard != null) {
+			CashCard updatedCashCard = new CashCard(savedCashCard.id(), cashCard.amount(), savedCashCard.owner());
+			cashCardRepository.save(updatedCashCard);
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteCashCard(@PathVariable Long id, Principal principal) {
+		
+		CashCard toBeDeletedCashCard = cashCardRepository.findByIdAndOwner(id, principal.getName());
+		if(toBeDeletedCashCard != null) {
+			cashCardRepository.delete(toBeDeletedCashCard);
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
 	}
 }
